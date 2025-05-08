@@ -23,6 +23,7 @@ if (isset($_GET['ip'])) {
             padding: 10px 20px;
             display: flex;
             align-items: center;
+            justify-content: space-between; /* Space between logo and IP address */
         }
 
         header img {
@@ -33,24 +34,34 @@ if (isset($_GET['ip'])) {
         header h1 {
             font-size: 1.8rem;
             color: #ffffff;
+            margin: 0;
+        }
+
+        header .ip-address {
+            font-size: 0.9rem;
+            color: rgb(0 160 233); /* Blue color used for buttons */
+            margin-left: 10px;
+            font-weight: normal;
         }
 
         .container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-wrap: wrap;  /* Allow the items to wrap onto the next line */
+            justify-content: center;  /* Center them both */
+            gap: 20px;  /* Add some gap between the cards */
             padding: 20px;
-            gap: 20px;
         }
-
+        
         .card {
             background-color: #2c2c2d;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            width: 680px;
+            max-width: 50%;
+            min-width: 640px;
+            position: relative;  /* Allow the button to be positioned absolutely inside */
         }
-        
+
         iframe {
             display: block;
             margin: 0 auto;
@@ -59,6 +70,26 @@ if (isset($_GET['ip'])) {
             height: 480px;
             border: none;
             border-radius: 10px;
+        }
+
+        .refresh-button {
+            background-color: rgb(0 160 233);
+            color: white;
+            border: none;
+            padding: 12px 0;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            width: 50px;  /* Set fixed width for the button */
+            height: 50px; /* Set fixed height for the button */
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .refresh-button:hover {
+            background-color: rgb(1 140 203);
         }
 
         footer {
@@ -70,9 +101,10 @@ if (isset($_GET['ip'])) {
 
         @media (max-width: 700px) {
             .card {
-                width: 95%;
+                width: 100%;  /* Full width on smaller screens */
             }
         }
+        
     </style>
 </head>
 <body>
@@ -80,40 +112,36 @@ if (isset($_GET['ip'])) {
 <header>
     <img src="images/FF_logo.jpg" alt="Logo">
     <h1>Web UI</h1>
+    <?php if (isset($address)): ?>
+        <span class="ip-address"><?php echo "Connected Printer: " . $address; ?></span>
+    <?php endif; ?>
 </header>
 
 <div class="container">
-<div class="card">
-    <h2 style="display: flex; justify-content: space-between; align-items: center;">
-        <span>Live Stream</span>
-        <button onclick="document.getElementById('streamFrame').src += ''" style="
-            background-color: rgb(0 160 233);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-weight: bold;
-            font-family: 'Segoe UI', sans-serif;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        ">
-            <i class="fas fa-sync-alt"></i>
+    <div class="card">
+        <h2>Live Stream</h2>
+        <iframe id="liveStreamIframe" src="http://<?php echo $address; ?>:8080/?action=stream" height="480"></iframe>
+        <button class="refresh-button" onclick="refreshIframe()">
+            <i class="fas fa-sync"></i>
         </button>
-    </h2>
-    <iframe id="streamFrame" src="http://<?php echo $address; ?>:8080/?action=stream" height="480"></iframe>
-</div>
-
+    </div>
 
     <div class="card">
-        <h2>Status & Control</h2>
+        <h2>Control Panel</h2>
         <iframe src="ff.php?ip=<?php echo $address; ?>" height="480"></iframe>
     </div>
 </div>
 
 <footer>
 </footer>
+
+<script>
+    // Function to refresh the iframe
+    function refreshIframe() {
+        var iframe = document.getElementById('liveStreamIframe');
+        iframe.src = iframe.src; // This will reload the iframe by re-assigning the same source
+    }
+</script>
 
 </body>
 </html>
